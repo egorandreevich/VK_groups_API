@@ -24,7 +24,7 @@ class User: #Опишем юзера как класс
         final_json_list = []
         try:
             raw_json_groups = self.groups_get()
-            pprint(raw_json_groups)
+            # pprint(raw_json_groups)
             groups_list = raw_json_groups['response']['items']
             for dict_item in groups_list:
                 for key, value in dict_item.items():
@@ -34,10 +34,11 @@ class User: #Опишем юзера как класс
                         final_json['name'] = value
                     elif key == 'members_count':
                         final_json['members_count'] = value
+                print(final_json)
+
                 final_json_list.append(final_json)
         except KeyError:
             pass
-            # print([final_json])
         finally:
             return (final_json_list)
 
@@ -46,7 +47,7 @@ class User: #Опишем юзера как класс
             'access_token': self.my_token,
             'v': '5.92',
             'user_id': self.user_id_number,
-            'count' : '2' #пока ограничимся пятью, тормозит нереально
+            'count' : '5' #пока ограничимся пятью, тормозит нереально
         }
         response = requests.get('https://api.vk.com/method/friends.get', params)
         return response.json()
@@ -78,6 +79,7 @@ evgeniy = User(171691064)
 pprint(evgeniy.make_groups_systematic())
 # pprint(evgeniy.friends_list)
 # pprint(evgeniy.make_class_items())
-pprint(evgeniy.get_groups_of_friends())
+# pprint(evgeniy.get_groups_of_friends())
 
 # pprint(final_json_list)
+
