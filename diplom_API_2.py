@@ -1,6 +1,7 @@
 import requests
 from pprint import pprint
 import json
+import time
 
 class User: #Опишем юзера как класс
     def __init__(self, i):
@@ -9,7 +10,7 @@ class User: #Опишем юзера как класс
         try:
             self.friends_list = self.friends_dic['response']['items']
         except KeyError:
-            pass
+            time.sleep(1)
 
     def groups_get(self):  # получил группы юзера
         params = {
@@ -21,7 +22,9 @@ class User: #Опишем юзера как класс
             # 'count': '500'
         }
         response = requests.get('https://api.vk.com/method/groups.get', params)
+        time.sleep(1)
         return response.json()
+
 
     def get_friends(self): #получаю список друзей юзера
         params = {
@@ -30,7 +33,10 @@ class User: #Опишем юзера как класс
             'user_id': self.user_id_number,
             # 'count' : '5' #пока ограничимся пятью, тормозит нереально
         }
-        response = requests.get('https://api.vk.com/method/friends.get', params)
+        try:
+            response = requests.get('https://api.vk.com/method/friends.get', params)
+        except KeyError:
+            time.sleep(1)
         return response.json()
 
     def info_about_group(self, group_id): #получаю расширенную информацию о группе
@@ -41,7 +47,10 @@ class User: #Опишем юзера как класс
             'fields' : 'members_count'
             # 'count': '5'  # пока ограничимся пятью, тормозит нереально
         }
-        response = requests.get('https://api.vk.com/method/groups.getById', params)
+        try:
+            response = requests.get('https://api.vk.com/method/groups.getById', params)
+        except KeyError:
+            time.sleep(1)
         return response.json()
 
     def make_class_items(self): #функция для превращения айдишек друзей в экземпляры класса
@@ -100,7 +109,7 @@ class User: #Опишем юзера как класс
                     elif key == 'members_count':
                         final_json['members_count'] = value
             final_json_list.append(final_json)
-        # pprint(final_json_list)
+        pprint(final_json_list)
         return final_json_list
 
     def save_to_file(self): #записываю в файл результат приведения расширенной инфы о группах в нужный формат
@@ -111,7 +120,7 @@ class User: #Опишем юзера как класс
 
     my_token = 'ed1271af9e8883f7a7c2cefbfddfcbc61563029666c487b2f71a5227cce0d1b533c4af4c5b888633c06ae'
     user_id_number = 0
-   
+
 def get_id(user): #функция вне класса для получения айди первого юзера, напр, если ввели короткую ссылку eshmargunov
     params = {
         'access_token': 'ed1271af9e8883f7a7c2cefbfddfcbc61563029666c487b2f71a5227cce0d1b533c4af4c5b888633c06ae',
@@ -124,12 +133,22 @@ def get_id(user): #функция вне класса для получения 
         for key, value in dictionary.items():
             if key == 'id':
                 id = value
-        return id
-    
+            return id
+
 
 if __name__ == "__main__":
     user = get_id(input('Сейчас будем искать уникальные группы пользователя.\nНапишите короткую ссылку или айди страницы, которую будем исследовать:\n'))
     evgeniy = User(user)
+# evgeniy = User(40635795)
+# pprint(evgeniy.friends_list)
+# pprint(evgeniy.groups_get())
+# set_1 = set(evgeniy.groups_get()['response']['items'])
+# set_2 = set(evgeniy.get_groups_of_friends())
+# pprint(set_2)
+# print('Уникальные группы у указанного юзера: {}'.format(set_1.difference(set_2)))
+# evgeniy.find_unique_groups()
+# evgeniy.info_unique_groups()
+# evgeniy.info_about_group()
     evgeniy.save_to_file()
 
 
